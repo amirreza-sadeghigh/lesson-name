@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TTC Lesson Plan</title>
+  <style>
+    html { color-scheme: light dark; }
+    :root{
+      --bg: color-mix(in oklab, Canvas 92%, transparent);
+      --card: color-mix(in oklab, Canvas 98%, transparent);
+      --ink: CanvasText;
+      --muted: color-mix(in oklab, CanvasText 55%, transparent);
+      --ring: color-mix(in oklab, #4f46e5 70%, Canvas 30%);
+      --radius: 18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 20% -10%, color-mix(in oklab, #4f46e5 12%, transparent), transparent 60%),
+      radial-gradient(1400px 800px at 120% 10%, color-mix(in oklab, #06b6d4 10%, transparent), transparent 60%),
+      var(--bg);
+      color: var(--ink);
+    }
+    header{
+      position: sticky; top:0; backdrop-filter: saturate(1.2) blur(8px);
+      background: color-mix(in oklab, var(--bg) 80%, transparent);
+      border-bottom: 1px solid color-mix(in oklab, CanvasText 10%, transparent);
+      z-index: 10;
+    }
+    .wrap{ max-width: 1100px; margin: 0 auto; padding: 18px 22px; }
+    h1{ margin:0; font-size: clamp(1.2rem, 1rem + 1.2vw, 2rem); letter-spacing: .2px; }
+    main{ max-width: 1100px; margin: 0 auto; padding: 28px 22px 60px; }
+
+    .grid{
+      display:grid;
+      gap:20px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .card{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
+      aspect-ratio: 1/1;
+      border-radius: var(--radius);
+      background: var(--card);
+      border:1px solid color-mix(in oklab, CanvasText 12%, transparent);
+      box-shadow: 0 12px 34px color-mix(in oklab, CanvasText 7%, transparent);
+      text-decoration:none;
+      color:inherit;
+      padding:28px;
+      user-select:none;
+      transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .card:hover{ transform: translateY(-2px); border-color: var(--ring); box-shadow: 0 12px 35px color-mix(in oklab, var(--ring) 18%, transparent); }
+    .card svg{ width:72px; height:72px; }
+    .label{ font-weight:700; letter-spacing:.3px; font-size: clamp(1rem, 0.95rem + 0.4vw, 1.25rem); }
+    .hint{ font-size:.95rem; color: var(--muted); }
+
+    .sections{ margin-top: 28px; }
+    section{ display:none; background: var(--card); border:1px solid color-mix(in oklab, CanvasText 12%, transparent); border-radius: var(--radius); padding:24px; box-shadow: 0 12px 35px color-mix(in oklab, CanvasText 7%, transparent); }
+    section.active{ display:block; }
+
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+    .breadcrumbs{ font-size:.9rem; color: var(--muted); }
+    .btn{ display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius: 12px; border:1px solid color-mix(in oklab, CanvasText 14%, transparent); background: color-mix(in oklab, var(--bg) 85%, transparent); cursor:pointer; text-decoration:none; color:inherit; }
+    .btn:hover{ border-color: var(--ring); }
+
+    .cards{ display:grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap:14px; margin-top:14px; }
+    .mini{
+      padding:14px; border:1px dashed color-mix(in oklab, CanvasText 18%, transparent); border-radius:12px; background: color-mix(in oklab, var(--bg) 75%, transparent);
+    }
+    .notice{ font-size:.9rem; color: var(--muted); }
+    .kbd{ font-variant-numeric: tabular-nums; padding:.15rem .45rem; border:1px solid color-mix(in oklab, CanvasText 18%, transparent); border-radius:8px; }
+
+    /* printable word cards */
+    .print-cards{ display: grid; grid-template-columns: repeat(auto-fill,minmax(140px,1fr)); gap:12px; margin-top:14px; }
+    .print-cards .pcard{ border:1px solid color-mix(in oklab, CanvasText 18%, transparent); background:white; color:black; border-radius:10px; padding:12px; text-align:center; font-weight:700; }
+    @media (prefers-color-scheme:dark){ .print-cards .pcard{ background: #111; color:#fafafa; }}
+
+    /* === Vocabulary image-first cards === */
+    .vocab-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 20px;
+      justify-items: center;
+    }
+    .vcard{
+      width: 100%;
+      max-width: 380px;
+      border: 1px solid color-mix(in oklab, CanvasText 12%, transparent);
+      border-radius: 18px;
+      background: color-mix(in oklab, var(--bg) 70%, transparent);
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color .2s ease, box-shadow .2s ease, transform .12s ease;
+      box-shadow: 0 10px 30px color-mix(in oklab, CanvasText 8%, transparent);
+    }
+    .vcard:hover{ border-color: var(--ring); transform: translateY(-1px); }
+    .thumb{
+      width:100%; aspect-ratio: 1/1; display:block; object-fit:cover; background: #ddd;
+    }
+    .reveal{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:12px 14px; border-top:1px solid color-mix(in oklab, CanvasText 10%, transparent);
+      opacity:0; transform: translateY(6px); pointer-events:none; transition: opacity .18s ease, transform .18s ease;
+    }
+    .vcard.revealed .reveal{ opacity:1; transform: translateY(0); pointer-events:auto; }
+    .word{
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size: clamp(1.4rem, 1rem + 1.6vw, 2.2rem);
+      line-height: 1.1;
+    }
+    .speak-btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:34px; height:34px; border-radius:10px;
+      border:1px solid color-mix(in oklab, CanvasText 18%, transparent);
+      background: color-mix(in oklab, var(--bg) 85%, transparent);
+    }
+    .speak-btn:hover{ border-color: var(--ring); }
+    .speak-btn svg{ width:18px; height:18px; }
+    .ipa{
+      font-size:.85rem; color: var(--muted); padding: 0 14px 12px;
+      display:none;
+    }
+    .vcard.revealed .ipa{ display:block; }
+
+    /* improves layout stability */
+    img[width][height]{ height:auto; }
+    .score-card {
+      border:1px solid color-mix(in oklab, CanvasText 14%, transparent);
+      border-radius:12px;
+      padding:14px;
+      background: color-mix(in oklab, var(--bg) 85%, transparent);
+      box-shadow: 0 6px 16px color-mix(in oklab, CanvasText 7%, transparent);
+    }
+    .score-card h4 { margin:0 0 10px; }
+    .score { font-size:2rem; font-weight:700; margin:8px 0; }
+    .score-btn { margin:4px; }
+    /* === Production (individual sentences) === */
+    .prod-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap:16px;
+      margin-top:14px;
+    }
+    .prod-card{
+      border:1px solid color-mix(in oklab, CanvasText 14%, transparent);
+      border-radius:14px;
+      background: color-mix(in oklab, var(--bg) 85%, transparent);
+      box-shadow: 0 8px 22px color-mix(in oklab, CanvasText 7%, transparent);
+      padding:14px;
+    }
+    .prod-word{
+      font-weight:900;
+      letter-spacing:.3px;
+      font-size: clamp(1.6rem, 1.1rem + 2.2vw, 2.6rem);
+      line-height:1.05;
+      margin-bottom:8px;
+    }
+    .prod-ex{
+      margin:0; padding-left:18px;
+      font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.05rem);
+    }
+    .prod-ex li{ margin:6px 0; }
+
+    .prod-timer{
+      margin-top:24px;
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      flex-wrap:wrap;
+    }
+    .prod-timer-display{
+      font-variant-numeric: tabular-nums;
+      font-weight:800;
+      font-size: clamp(1.6rem, 1.2rem + 1.8vw, 2.2rem);
+      padding:6px 12px;
+      border:1px solid color-mix(in oklab, CanvasText 18%, transparent);
+      border-radius:12px;
+      background: color-mix(in oklab, var(--bg) 85%, transparent);
+      color:#e11d48; /* red-ish */
+    }
+
+
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Lesson Plan — Vocabulary, Game & Production</h1>
+  </div>
+</header>
+
+<main>
+  <!-- HOME ICONS -->
+  <div id="home" class="sections">
+    <div class="grid">
+      <a class="card" href="#vocabulary" data-nav>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19a2 2 0 0 0 2 2h13"/><path d="M20 22V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v13"/><path d="M8 6h9"/></svg>
+        <div class="label">Vocabulary</div>
+        <div class="hint">Target words & A2-friendly meanings</div>
+      </a>
+      <a class="card" href="#game" data-nav>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v1a3 3 0 0 1-3 3h-2l-2-2h-4l-2 2H6a3 3 0 0 1-3-3v-1Z"/><path d="M7.5 13.5v3"/><path d="M6 15h3"/><circle cx="17.5" cy="15" r="1"/></svg>
+        <div class="label">Game (Practice)</div>
+        <div class="hint">Pantomime / Charades</div>
+      </a>
+      <a class="card" href="#production" data-nav>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v2"/><path d="M21 8v8"/><path d="M7 8v8"/><path d="M17 5v14"/><path d="M3 13c2 0 4-2 7-2s5 2 7 2 4-2 4-2"/></svg>
+        <div class="label">Production</div>
+        <div class="hint">Free use of new words</div>
+      </a>
+      <a class="card" href="#presentation" data-nav>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 20l2-4h6l2 4"/></svg>
+        <div class="label">Presentation</div>
+        <div class="hint">How to introduce the words</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- CONTENT SECTIONS -->
+  <section id="vocabulary" aria-labelledby="vocab-title">
+    <div class="topbar">
+      <a class="btn" href="#home" data-home>← Home</a>
+      <div class="breadcrumbs">Vocabulary • A2 level • Ages 14–16</div>
+    </div>
+    <h2 id="vocab-title">Target Vocabulary</h2>
+    <p class="notice">Tap each picture to reveal the word. Press the speaker to hear pronunciation.</p>
+
+    <!-- Image-first vocab cards -->
+    <div class="vocab-grid" id="vocabGrid">
+      <!-- Cards are defined in HTML for clarity; JS wires behavior -->
+      <figure class="vcard" data-audio="audio/mountain.mp3">
+        <img class="thumb" src="img/mountain.jpg" alt="snowy mountain" loading="lazy" width="800" height="800">
+        <figcaption class="reveal">
+          <span class="word">mountain</span>
+          <button class="speak-btn" type="button" aria-label="Play pronunciation" title="Play pronunciation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 5l-5 4H3v6h3l5 4V5z"/><path d="M15 9a4 4 0 010 6"/><path d="M17 7a7 7 0 010 10"/>
+            </svg>
+          </button>
+        </figcaption>
+        <div class="ipa">/ˈmaʊn.tən/</div>
+        <audio preload="none" src="audio/mountain.mp3"></audio>
+      </figure>
+
+      <figure class="vcard" data-audio="audio/Ocean.mp3">
+        <img class="thumb" src="img/ocean.jpg" alt="blue ocean" loading="lazy" width="800" height="800">
+        <figcaption class="reveal">
+          <span class="word">ocean</span>
+          <button class="speak-btn" type="button" aria-label="Play pronunciation" title="Play pronunciation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 5l-5 4H3v6h3l5 4V5z"/><path d="M15 9a4 4 0 010 6"/><path d="M17 7a7 7 0 010 10"/>
+            </svg>
+          </button>
+        </figcaption>
+        <div class="ipa">/ˈoʊ.ʃən/</div>
+        <audio preload="none" src="audio/Ocean.mp3"></audio>
+      </figure>
+
+      <figure class="vcard" data-audio="audio/take-a-nap.mp3">
+        <img class="thumb" src="img/nap.jpg" alt="person taking a nap on a couch" loading="lazy" width="800" height="800">
+        <figcaption class="reveal">
+          <span class="word">take a nap</span>
+          <button class="speak-btn" type="button" aria-label="Play pronunciation" title="Play pronunciation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 5l-5 4H3v6h3l5 4V5z"/><path d="M15 9a4 4 0 010 6"/><path d="M17 7a7 7 0 010 10"/>
+            </svg>
+          </button>
+        </figcaption>
+        <div class="ipa">/teɪk ə ˈnæp/</div>
+        <audio preload="none" src="audio/take-a-nap.mp3"></audio>
+      </figure>
+
+      <figure class="vcard" data-audio="audio/floor.mp3">
+        <img class="thumb" src="img/floor.jpg" alt="indoor wooden floor" loading="lazy" width="800" height="800">
+        <figcaption class="reveal">
+          <span class="word">floor</span>
+          <button class="speak-btn" type="button" aria-label="Play pronunciation" title="Play pronunciation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 5l-5 4H3v6h3l5 4V5z"/><path d="M15 9a4 4 0 010 6"/><path d="M17 7a7 7 0 010 10"/>
+            </svg>
+          </button>
+        </figcaption>
+        <div class="ipa">/flɔr/ (AmE)</div>
+        <audio preload="none" src="audio/floor.mp3"></audio>
+      </figure>
+
+      <figure class="vcard" data-audio="audio/heart-attack.mp3">
+        <img class="thumb" src="img/heart.jpg" alt="heart health concept" loading="lazy" width="800" height="800">
+        <figcaption class="reveal">
+          <span class="word">heart attack</span>
+          <button class="speak-btn" type="button" aria-label="Play pronunciation" title="Play pronunciation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 5l-5 4H3v6h3l5 4V5z"/><path d="M15 9a4 4 0 010 6"/><path d="M17 7a7 7 0 010 10"/>
+            </svg>
+          </button>
+        </figcaption>
+        <div class="ipa">/ˈhɑːrt əˌtæk/</div>
+        <audio preload="none" src="audio/heart-attack.mp3"></audio>
+      </figure>
+
+      <figure class="vcard" data-audio="audio/function.mp3">
+        <img class="thumb" src="img/function.jpg" alt="a pen to show purpose" loading="lazy" width="800" height="800">
+        <figcaption class="reveal">
+          <span class="word">function</span>
+          <button class="speak-btn" type="button" aria-label="Play pronunciation" title="Play pronunciation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 5l-5 4H3v6h3l5 4V5z"/><path d="M15 9a4 4 0 010 6"/><path d="M17 7a7 7 0 010 10"/>
+            </svg>
+          </button>
+        </figcaption>
+        <div class="ipa">/ˈfʌŋk.ʃən/</div>
+        <audio preload="none" src="audio/function.mp3"></audio>
+      </figure>
+    </div>
+
+    <h3 style="margin-top:22px;">Printable word cards</h3>
+    <p class="notice">Press <span class="kbd">Ctrl/Cmd + P</span> to print and cut for games.</p>
+    <div class="print-cards">
+      <div class="pcard">mountain</div>
+      <div class="pcard">ocean</div>
+      <div class="pcard">take a nap</div>
+      <div class="pcard">floor</div>
+      <div class="pcard">heart attack</div>
+      <div class="pcard">function</div>
+    </div>
+  </section>
+
+  <section id="game" aria-labelledby="game-title">
+    <div class="topbar">
+      <a class="btn" href="#home" data-home>← Home</a>
+      <div class="breadcrumbs">Practice • Drawing Game (Pictionary)</div>
+    </div>
+    <h2 id="game-title">Drawing Game (Pictionary) — 7–10 mins</h2>
+
+    <div class="cards">
+      <div class="mini">
+        <strong>Goal:</strong> One student from each group draws the secret word on the board. Teammates guess the word.
+      </div>
+      <div class="mini">
+        <strong>Setup:</strong> 4 groups (2×4, 2×3). Teacher secretly assigns each group a random word.
+      </div>
+      <div class="mini">
+        <strong>Rules:</strong> No letters, numbers, or writing words. Each group has <strong>1 minute</strong> to guess.
+      </div>
+      <div class="mini">
+        <strong>Scoring:</strong> First team to guess their word correctly earns a point. Rotate drawers each round if repeating.
+      </div>
+    </div>
+
+    <!-- Scoreboard -->
+    <div style="margin-top:40px;">
+      <h3 style="text-align:center; margin-bottom:16px;">Scoreboard</h3>
+      <div id="scoreboard" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:16px; text-align:center;">
+        <div class="score-card">
+          <h4>Group 1</h4>
+          <div class="score" id="score1">0</div>
+          <button class="btn score-btn" onclick="changeScore(1,1)">➕</button>
+          <button class="btn score-btn" onclick="changeScore(1,-1)">➖</button>
+        </div>
+        <div class="score-card">
+          <h4>Group 2</h4>
+          <div class="score" id="score2">0</div>
+          <button class="btn score-btn" onclick="changeScore(2,1)">➕</button>
+          <button class="btn score-btn" onclick="changeScore(2,-1)">➖</button>
+        </div>
+        <div class="score-card">
+          <h4>Group 3</h4>
+          <div class="score" id="score3">0</div>
+          <button class="btn score-btn" onclick="changeScore(3,1)">➕</button>
+          <button class="btn score-btn" onclick="changeScore(3,-1)">➖</button>
+        </div>
+        <div class="score-card">
+          <h4>Group 4</h4>
+          <div class="score" id="score4">0</div>
+          <button class="btn score-btn" onclick="changeScore(4,1)">➕</button>
+          <button class="btn score-btn" onclick="changeScore(4,-1)">➖</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Random Word Generator -->
+    <div style="margin-top:24px; text-align:center;">
+      <button id="randomWordBtn" class="btn">🎲 Get Random Word</button>
+      <button id="resetWordsBtn" class="btn" style="margin-left:8px;">🔄 Reset List</button>
+      <div id="randomWordDisplay" style="margin-top:18px; font-size:2rem; font-weight:700;"></div>
+    </div>
+
+    <!-- Timer -->
+    <div style="margin-top:30px; text-align:center;">
+      <button id="startTimerBtn" class="btn">⏱️ Start 1-Min Timer</button>
+      <div id="timerDisplay" style="margin-top:16px; font-size:1.8rem; font-weight:700; color:#e11d48;"></div>
+    </div>
+  </section>
+
+  <section id="production" aria-labelledby="prod-title">
+    <div class="topbar">
+      <a class="btn" href="#home" data-home>← Home</a>
+      <div class="breadcrumbs">Production • Individual Sentences</div>
+    </div>
+    <h2 id="prod-title">Production — Write Your Own Sentences</h2>
+    <p class="notice">Write <strong>one sentence for each word</strong>. Use the examples to help you. When the timer ends, we share a few.</p>
+
+    <!-- BIG words with examples -->
+    <div class="prod-grid">
+      <div class="prod-card">
+        <div class="prod-word">mountain</div>
+        <ul class="prod-ex">
+          <li>Mount Damavand is a mountain.</li>
+          <li>We climbed a mountain last summer.</li>
+        </ul>
+      </div>
+      <div class="prod-card">
+        <div class="prod-word">ocean</div>
+        <ul class="prod-ex">
+          <li>The Pacific is an ocean.</li>
+          <li>I like to swim in the ocean.</li>
+        </ul>
+      </div>
+      <div class="prod-card">
+        <div class="prod-word">take a nap</div>
+        <ul class="prod-ex">
+          <li>I take a nap in the afternoon.</li>
+          <li>He wants to take a nap after school.</li>
+        </ul>
+      </div>
+      <div class="prod-card">
+        <div class="prod-word">floor</div>
+        <ul class="prod-ex">
+          <li>My bag is on the floor.</li>
+          <li>Please sit on the floor.</li>
+        </ul>
+      </div>
+      <div class="prod-card">
+        <div class="prod-word">heart attack</div>
+        <ul class="prod-ex">
+          <li>He had a heart attack.</li>
+          <li>A heart attack is an emergency.</li>
+        </ul>
+      </div>
+      <div class="prod-card">
+        <div class="prod-word">function</div>
+        <ul class="prod-ex">
+          <li>The function of a pen is to write.</li>
+          <li>The function of a phone is to call people.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 5-minute timer -->
+    <div class="prod-timer">
+      <button id="startProdTimerBtn" class="btn">⏱️ Start 5-Minute Timer</button>
+      <button id="resetProdTimerBtn" class="btn">🔄 Reset</button>
+      <div id="prodTimerDisplay" class="prod-timer-display">05:00</div>
+    </div>
+  </section>
+
+  <section id="presentation" aria-labelledby="pres-title">
+    <div class="topbar">
+      <a class="btn" href="#home" data-home>← Home</a>
+      <div class="breadcrumbs">Presentation • Set the task • CCQs</div>
+    </div>
+    <h2 id="pres-title">Presentation — 10–15 mins</h2>
+    <div class="cards">
+      <div class="mini"><strong>Lead-in:</strong> quick photo prompts (mountains, the ocean, someone yawning, etc.) — elicit ideas.</div>
+      <div class="mini"><strong>Model & Meaning:</strong> show word → mime or picture → chorally drill pronunciation → write form.</div>
+      <div class="mini"><strong>CCQs:</strong> simple yes/no or either/or checks (e.g., “Is a <em>mountain</em> bigger than a hill?”).</div>
+      <div class="mini"><strong>Transition:</strong> explain the upcoming game and demo one round with a volunteer.</div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Simple hash-based navigation
+  const sections = Array.from(document.querySelectorAll('section'));
+  const home = document.getElementById('home');
+
+  function showFromHash(){
+    const id = location.hash.replace('#','');
+    sections.forEach(s=>s.classList.remove('active'));
+    if (!id || id === 'home') { home.style.display = 'block'; return; }
+    home.style.display = 'none';
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+  }
+  window.addEventListener('hashchange', showFromHash);
+  window.addEventListener('DOMContentLoaded', showFromHash);
+  document.querySelectorAll('[data-home]').forEach(a=>{
+    a.addEventListener('click', ()=>{ sections.forEach(s=>s.classList.remove('active')); home.style.display='block'; });
+  });
+
+  // === Vocabulary reveal + audio ===
+  const cards = document.querySelectorAll('.vcard');
+
+  cards.forEach(card => {
+    // toggle reveal on image/card click
+    card.addEventListener('click', (e) => {
+      // if click came from the button, let button handler run instead
+      if (e.target.closest('.speak-btn')) return;
+      card.classList.toggle('revealed');
+    });
+
+    // play audio on speaker click
+    const btn = card.querySelector('.speak-btn');
+    const audioEl = card.querySelector('audio');
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation(); // don't toggle reveal when pressing speaker
+      if (!card.classList.contains('revealed')) card.classList.add('revealed');
+      // rewind and play (snappy for drilling)
+      try {
+        audioEl.currentTime = 0;
+        audioEl.play();
+      } catch (_) {}
+    });
+
+    // preload audio on hover for faster class demo
+    card.addEventListener('mouseenter', () => {
+      if (audioEl && audioEl.preload !== 'auto') {
+        audioEl.preload = 'auto';
+        // touch the src by loading
+        audioEl.load();
+      }
+    }, { once: true });
+  });
+
+  // === Random Word Generator ===
+  let words = ["mountain","ocean","take a nap","floor","heart attack","function"];
+  let usedWords = [];
+  const randomBtn = document.getElementById("randomWordBtn");
+  const resetBtn = document.getElementById("resetWordsBtn");
+  const wordDisplay = document.getElementById("randomWordDisplay");
+
+  randomBtn.addEventListener("click", () => {
+    if (words.length === 0) {
+      wordDisplay.textContent = "All words used! Reset list to start again.";
+      return;
+    }
+    const index = Math.floor(Math.random() * words.length);
+    const word = words[index];
+    words.splice(index, 1); // remove used word
+    usedWords.push(word);
+    wordDisplay.textContent = word;
+  });
+
+  resetBtn.addEventListener("click", () => {
+    words = ["mountain","ocean","take a nap","floor","heart attack","function"];
+    usedWords = [];
+    wordDisplay.textContent = "Word list reset!";
+  });
+
+  // === 1-Minute Timer ===
+  const startTimerBtn = document.getElementById("startTimerBtn");
+  const timerDisplay = document.getElementById("timerDisplay");
+  let timerInterval;
+
+  startTimerBtn.addEventListener("click", () => {
+    clearInterval(timerInterval);
+    let timeLeft = 60;
+    timerDisplay.textContent = "60s";
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerDisplay.textContent = timeLeft + "s";
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        timerDisplay.textContent = "⏰ Time’s up!";
+      }
+    }, 1000);
+  });
+  // === Scoreboard logic ===
+  function changeScore(group, delta) {
+    const scoreEl = document.getElementById("score" + group);
+    let current = parseInt(scoreEl.textContent);
+    let newScore = current + delta;
+    if (newScore < 0) newScore = 0; // no negative scores
+    scoreEl.textContent = newScore;
+  }
+  // === Production 5-minute timer ===
+  (function(){
+    const startBtn = document.getElementById("startProdTimerBtn");
+    const resetBtn = document.getElementById("resetProdTimerBtn");
+    const display  = document.getElementById("prodTimerDisplay");
+    if (!startBtn || !resetBtn || !display) return;
+
+    let prodInterval = null;
+    const START_SECONDS = 300; // 5 minutes
+
+    function format(s){
+      const m = Math.floor(s/60).toString().padStart(2,"0");
+      const sec = (s%60).toString().padStart(2,"0");
+      return `${m}:${sec}`;
+    }
+
+    function startTimer(){
+      clearInterval(prodInterval);
+      let t = START_SECONDS;
+      display.textContent = format(t);
+      prodInterval = setInterval(()=>{
+        t--;
+        display.textContent = format(Math.max(t,0));
+        if (t <= 0){
+          clearInterval(prodInterval);
+          display.textContent = "⏰ Time’s up!";
+        }
+      }, 1000);
+    }
+
+    function resetTimer(){
+      clearInterval(prodInterval);
+      display.textContent = format(START_SECONDS);
+    }
+
+    startBtn.addEventListener("click", startTimer);
+    resetBtn.addEventListener("click", resetTimer);
+
+    // initialize display
+    display.textContent = format(START_SECONDS);
+  })();
+</script>
+</body>
+</html>
