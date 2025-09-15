@@ -30,6 +30,7 @@
       border:1px solid rgba(255,255,255,.35);
       background: rgba(255,255,255,.14);
       backdrop-filter: blur(10px);
+      cursor:pointer;
     }
     .btn:hover{border-color:#fff}
 
@@ -48,6 +49,7 @@
       width:100%; max-width:1000px; display:block; margin:0 auto;
       border-radius:18px; box-shadow:0 12px 40px rgba(0,0,0,.55);
     }
+    
 
     /* vocab cards */
     .vocab-grid{
@@ -74,6 +76,12 @@
     }
     .word{ font-weight:900; letter-spacing:.3px; font-size: clamp(1.4rem, 1rem + 1.6vw, 2rem); line-height:1.1;}
     .vcard.revealed .reveal{ opacity:1; transform:translateY(0); pointer-events:auto; }
+
+    /* game */
+    .game-img{
+      max-width:400px; width:100%; border-radius:16px;
+      box-shadow:0 12px 34px rgba(0,0,0,.55); display:block; margin:20px auto;
+    }
   </style>
 </head>
 <body>
@@ -89,49 +97,116 @@
     <div class="panel">
       <img src="img/reading.jpg" alt="Reading Passage Strange Jobs" class="reading-img">
     </div>
+<div style="margin-top:16px;">
+  <button class="btn" id="play-audio">🔊 Play Audio</button>
+  <audio id="reading-audio" src="audio/luvvoice.com-20250915-AmzxkB.mp3"></audio>
+</div>
+    <!-- Buttons -->
+    <div style="margin-top:22px;display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn" id="show-vocab">📖 Go to Vocabulary</button>
+      <button class="btn" id="show-game">🎭 Go to Game</button>
+    </div>
 
-    <!-- Content words -->
-    <div class="panel">
-      <h2>Content Words</h2>
+    <!-- Vocabulary Panel -->
+    <div class="panel" id="vocab-panel" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
+        <h2>Content Words</h2>
+        <button class="btn" id="back-reading1">← Back to Reading</button>
+      </div>
       <p>Tap each picture to reveal the word.</p>
       <div class="vocab-grid">
-        <figure class="vcard">
-          <img class="thumb" src="img/bike.jpg" alt="bicycle">
-          <figcaption class="reveal"><span class="word">Bicycle</span></figcaption>
-        </figure>
-        <figure class="vcard">
-          <img class="thumb" src="img/canal.jpg" alt="canal">
-          <figcaption class="reveal"><span class="word">Canal</span></figcaption>
-        </figure>
-        <figure class="vcard">
-          <img class="thumb" src="img/customer.jpg" alt="customer">
-          <figcaption class="reveal"><span class="word">Customer</span></figcaption>
-        </figure>
-        <figure class="vcard">
-          <img class="thumb" src="img/free.jpg" alt="free">
-          <figcaption class="reveal"><span class="word">Free</span></figcaption>
-        </figure>
-        <figure class="vcard">
-          <img class="thumb" src="img/lie.jpg" alt="lie">
-          <figcaption class="reveal"><span class="word">Lie</span></figcaption>
-        </figure>
-        <figure class="vcard">
-          <img class="thumb" src="img/millions.png" alt="millions">
-          <figcaption class="reveal"><span class="word">Millions</span></figcaption>
-        </figure>
-        <figure class="vcard">
-          <img class="thumb" src="img/push.jpg" alt="push">
-          <figcaption class="reveal"><span class="word">Push</span></figcaption>
-        </figure>
+        <figure class="vcard"><img class="thumb" src="img/bike.jpg"><figcaption class="reveal"><span class="word">Bicycle</span></figcaption></figure>
+        <figure class="vcard"><img class="thumb" src="img/canal.jpg"><figcaption class="reveal"><span class="word">Canal</span></figcaption></figure>
+        <figure class="vcard"><img class="thumb" src="img/customer.jpg"><figcaption class="reveal"><span class="word">Customer</span></figcaption></figure>
+        <figure class="vcard"><img class="thumb" src="img/free.jpg"><figcaption class="reveal"><span class="word">Free</span></figcaption></figure>
+        <figure class="vcard"><img class="thumb" src="img/lie.jpg"><figcaption class="reveal"><span class="word">Lie</span></figcaption></figure>
+        <figure class="vcard"><img class="thumb" src="img/millions.png"><figcaption class="reveal"><span class="word">Millions</span></figcaption></figure>
+        <figure class="vcard"><img class="thumb" src="img/push.jpg"><figcaption class="reveal"><span class="word">Push</span></figcaption></figure>
+      </div>
+    </div>
+
+    <!-- Game Panel -->
+    <div class="panel" id="game-panel" style="display:none;text-align:center;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
+        <h2>Pantomime Game</h2>
+        <button class="btn" id="back-reading2">← Back to Reading</button>
+      </div>
+      <p>One volunteer sees this image. They must pantomime the word. Their group guesses!</p>
+      <img id="game-image" class="game-img" src="" alt="Game word">
+      <div style="margin-top:18px;">
+        <button class="btn" id="next-word">Next Word</button>
       </div>
     </div>
   </main>
 
   <script>
-    // reveal toggle
+    // reveal toggle for vocab cards
     document.querySelectorAll('.vcard').forEach(card=>{
       card.addEventListener('click', ()=> card.classList.toggle('revealed'));
     });
+
+    const vocabPanel = document.getElementById('vocab-panel');
+    const gamePanel = document.getElementById('game-panel');
+    const showVocab = document.getElementById('show-vocab');
+    const showGame = document.getElementById('show-game');
+    const back1 = document.getElementById('back-reading1');
+    const back2 = document.getElementById('back-reading2');
+
+    showVocab.addEventListener('click', ()=>{
+      vocabPanel.style.display = 'block';
+      gamePanel.style.display = 'none';
+      window.scrollTo({ top: vocabPanel.offsetTop - 60, behavior: 'smooth' });
+    });
+    showGame.addEventListener('click', ()=>{
+      gamePanel.style.display = 'block';
+      vocabPanel.style.display = 'none';
+      window.scrollTo({ top: gamePanel.offsetTop - 60, behavior: 'smooth' });
+      showRandomWord();
+    });
+    back1.addEventListener('click', ()=>{
+      vocabPanel.style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    back2.addEventListener('click', ()=>{
+      gamePanel.style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Game randomizer
+    const words = [
+      {img:"img/bike.jpg", alt:"bicycle"},
+      {img:"img/canal.jpg", alt:"canal"},
+      {img:"img/customer.jpg", alt:"customer"},
+      {img:"img/free.jpg", alt:"free"},
+      {img:"img/lie.jpg", alt:"lie"},
+      {img:"img/millions.png", alt:"millions"},
+      {img:"img/push.jpg", alt:"push"}
+    ];
+    const gameImage = document.getElementById('game-image');
+    const nextBtn = document.getElementById('next-word');
+
+    function showRandomWord(){
+      const rand = words[Math.floor(Math.random()*words.length)];
+      gameImage.src = rand.img;
+      gameImage.alt = rand.alt;
+    }
+    nextBtn.addEventListener('click', showRandomWord);
+    const audio = document.getElementById('reading-audio');
+const playBtn = document.getElementById('play-audio');
+
+playBtn.addEventListener('click', ()=>{
+  if(audio.paused){
+    audio.play();
+    playBtn.textContent = "⏸ Pause Audio";
+  } else {
+    audio.pause();
+    playBtn.textContent = "🔊 Play Audio";
+  }
+});
+
+audio.addEventListener('ended', ()=>{
+  playBtn.textContent = "🔊 Play Audio";
+});
   </script>
 </body>
 </html>
