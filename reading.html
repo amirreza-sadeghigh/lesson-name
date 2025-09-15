@@ -44,14 +44,11 @@
       margin-bottom:20px;
     }
 
-    /* passage image */
     .reading-img{
       width:100%; max-width:1000px; display:block; margin:0 auto;
       border-radius:18px; box-shadow:0 12px 40px rgba(0,0,0,.55);
     }
-    
 
-    /* vocab cards */
     .vocab-grid{
       display:grid;
       grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
@@ -77,11 +74,33 @@
     .word{ font-weight:900; letter-spacing:.3px; font-size: clamp(1.4rem, 1rem + 1.6vw, 2rem); line-height:1.1;}
     .vcard.revealed .reveal{ opacity:1; transform:translateY(0); pointer-events:auto; }
 
-    /* game */
     .game-img{
       max-width:400px; width:100%; border-radius:16px;
       box-shadow:0 12px 34px rgba(0,0,0,.55); display:block; margin:20px auto;
     }
+
+    ul{margin:10px 0 0 22px}
+    li{margin-bottom:6px}
+
+    /* Matching game */
+    .match-container{
+      display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px
+    }
+    .jobs,.descriptions{display:flex;flex-direction:column;gap:12px}
+    .draggable{
+      padding:10px 14px;border-radius:10px;cursor:grab;
+      background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);
+      transition:transform .2s,background .3s;
+    }
+    .draggable.dragging{opacity:.5;transform:scale(.95)}
+    .dropzone{
+      padding:14px;border-radius:10px;min-height:50px;
+      background:rgba(255,255,255,.08);border:2px dashed rgba(255,255,255,.3);
+      transition:background .3s,border .3s;
+    }
+    .dropzone.correct{background:rgba(0,200,0,.25);border-color:lime;animation:pulse .6s}
+    .dropzone.wrong{background:rgba(200,0,0,.25);border-color:red}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
   </style>
 </head>
 <body>
@@ -97,22 +116,24 @@
     <div class="panel">
       <img src="img/reading.jpg" alt="Reading Passage Strange Jobs" class="reading-img">
     </div>
-<div style="margin-top:16px;">
-  <button class="btn" id="play-audio">🔊 Play Audio</button>
-  <audio id="reading-audio" src="audio/luvvoice.com-20250915-AmzxkB.mp3"></audio>
-</div>
+    <div style="margin-top:16px;">
+      <button class="btn" id="play-audio">🔊 Play Audio</button>
+      <audio id="reading-audio" src="audio/luvvoice.com-20250915-AmzxkB.mp3"></audio>
+    </div>
+
     <!-- Buttons -->
     <div style="margin-top:22px;display:flex;gap:12px;flex-wrap:wrap;">
-      <button class="btn" id="show-vocab">📖 Go to Vocabulary</button>
-      <button class="btn" id="show-game">🎭 Go to Game</button>
+      <button class="btn" id="show-vocab">📖 Vocabulary</button>
+      <button class="btn" id="show-game">🎭 Game</button>
+      <button class="btn" id="show-questions">❓ Questions</button>
+      <button class="btn" id="show-matching">🧩 Matching Game</button>
+      <button class="btn" id="show-production">📝 Production</button>
     </div>
 
     <!-- Vocabulary Panel -->
     <div class="panel" id="vocab-panel" style="display:none;">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
-        <h2>Content Words</h2>
-        <button class="btn" id="back-reading1">← Back to Reading</button>
-      </div>
+      <h2>Content Words</h2>
+      <button class="btn" id="back-reading1">← Back</button>
       <p>Tap each picture to reveal the word.</p>
       <div class="vocab-grid">
         <figure class="vcard"><img class="thumb" src="img/bike.jpg"><figcaption class="reveal"><span class="word">Bicycle</span></figcaption></figure>
@@ -125,88 +146,97 @@
       </div>
     </div>
 
-    <!-- Game Panel -->
-    <div class="panel" id="game-panel" style="display:none;text-align:center;">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
-        <h2>Pantomime Game</h2>
-        <button class="btn" id="back-reading2">← Back to Reading</button>
+    <!-- Matching Game Panel -->
+    <div class="panel" id="matching-panel" style="display:none;">
+      <h2>Matching Game</h2>
+      <button class="btn" id="back-reading6">← Back</button>
+      <p>Drag each <strong>job name</strong> onto the correct <strong>description</strong>.</p>
+
+      <div class="match-container">
+        <div class="jobs">
+          <div class="draggable" draggable="true" data-match="1">Bicycle Fisher</div>
+          <div class="draggable" draggable="true" data-match="2">Train Pusher</div>
+          <div class="draggable" draggable="true" data-match="3">Human Bed Warmer</div>
+          <div class="draggable" draggable="true" data-match="4">Passenger for Hire</div>
+        </div>
+        <div class="descriptions">
+          <div class="dropzone" data-match="1">Pulls old bicycles out of Amsterdam’s canals.</div>
+          <div class="dropzone" data-match="2">Helps commuters get onto crowded trains in Tokyo.</div>
+          <div class="dropzone" data-match="3">Lies in hotel beds in London to warm them.</div>
+          <div class="dropzone" data-match="4">Rides in cars in Jakarta so the driver doesn’t pay tolls.</div>
+        </div>
       </div>
-      <p>One volunteer sees this image. They must pantomime the word. Their group guesses!</p>
-      <img id="game-image" class="game-img" src="" alt="Game word">
-      <div style="margin-top:18px;">
-        <button class="btn" id="next-word">Next Word</button>
-      </div>
+    </div>
+
+    <!-- Production Panel -->
+    <div class="panel" id="production-panel" style="display:none;">
+      <h2>Production</h2>
+      <button class="btn" id="back-reading3">← Back</button>
+      <p><strong>Classwork:</strong> Work in pairs. Invent a strange job and ask/answer questions about it.</p>
+      <p><strong>Homework:</strong> Write 6–8 sentences about a strange job (real or imaginary). Use at least 4 of today’s content words.</p>
     </div>
   </main>
 
   <script>
-    // reveal toggle for vocab cards
+    // reveal toggle
     document.querySelectorAll('.vcard').forEach(card=>{
       card.addEventListener('click', ()=> card.classList.toggle('revealed'));
     });
 
-    const vocabPanel = document.getElementById('vocab-panel');
-    const gamePanel = document.getElementById('game-panel');
-    const showVocab = document.getElementById('show-vocab');
-    const showGame = document.getElementById('show-game');
-    const back1 = document.getElementById('back-reading1');
-    const back2 = document.getElementById('back-reading2');
+    const panels = {
+      vocab: document.getElementById('vocab-panel'),
+      matching: document.getElementById('matching-panel'),
+      production: document.getElementById('production-panel')
+    };
 
-    showVocab.addEventListener('click', ()=>{
-      vocabPanel.style.display = 'block';
-      gamePanel.style.display = 'none';
-      window.scrollTo({ top: vocabPanel.offsetTop - 60, behavior: 'smooth' });
-    });
-    showGame.addEventListener('click', ()=>{
-      gamePanel.style.display = 'block';
-      vocabPanel.style.display = 'none';
-      window.scrollTo({ top: gamePanel.offsetTop - 60, behavior: 'smooth' });
-      showRandomWord();
-    });
-    back1.addEventListener('click', ()=>{
-      vocabPanel.style.display = 'none';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    back2.addEventListener('click', ()=>{
-      gamePanel.style.display = 'none';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // Game randomizer
-    const words = [
-      {img:"img/bike.jpg", alt:"bicycle"},
-      {img:"img/canal.jpg", alt:"canal"},
-      {img:"img/customer.jpg", alt:"customer"},
-      {img:"img/free.jpg", alt:"free"},
-      {img:"img/lie.jpg", alt:"lie"},
-      {img:"img/millions.png", alt:"millions"},
-      {img:"img/push.jpg", alt:"push"}
-    ];
-    const gameImage = document.getElementById('game-image');
-    const nextBtn = document.getElementById('next-word');
-
-    function showRandomWord(){
-      const rand = words[Math.floor(Math.random()*words.length)];
-      gameImage.src = rand.img;
-      gameImage.alt = rand.alt;
+    function showPanel(panel){
+      Object.values(panels).forEach(p=>p.style.display='none');
+      panel.style.display='block';
+      window.scrollTo({ top: panel.offsetTop - 60, behavior: 'smooth' });
     }
-    nextBtn.addEventListener('click', showRandomWord);
+
+    document.getElementById('show-vocab').addEventListener('click', ()=> showPanel(panels.vocab));
+    document.getElementById('show-matching').addEventListener('click', ()=> showPanel(panels.matching));
+    document.getElementById('show-production').addEventListener('click', ()=> showPanel(panels.production));
+
+    document.getElementById('back-reading1').addEventListener('click', ()=> panels.vocab.style.display='none');
+    document.getElementById('back-reading3').addEventListener('click', ()=> panels.production.style.display='none');
+    document.getElementById('back-reading6').addEventListener('click', ()=> panels.matching.style.display='none');
+
+    // Matching game logic
+    const draggables=document.querySelectorAll('.draggable');
+    const dropzones=document.querySelectorAll('.dropzone');
+
+    draggables.forEach(d=>{
+      d.addEventListener('dragstart',()=>{d.classList.add('dragging')});
+      d.addEventListener('dragend',()=>{d.classList.remove('dragging')});
+    });
+
+    dropzones.forEach(zone=>{
+      zone.addEventListener('dragover',e=>{e.preventDefault()});
+      zone.addEventListener('drop',e=>{
+        e.preventDefault();
+        const dragged=document.querySelector('.dragging');
+        if(!dragged) return;
+        if(dragged.dataset.match===zone.dataset.match){
+          zone.textContent=dragged.textContent+" ✓ "+zone.textContent;
+          zone.classList.add('correct');
+          dragged.remove();
+        }else{
+          zone.classList.add('wrong');
+          setTimeout(()=>zone.classList.remove('wrong'),800);
+        }
+      });
+    });
+
+    // Audio
     const audio = document.getElementById('reading-audio');
-const playBtn = document.getElementById('play-audio');
-
-playBtn.addEventListener('click', ()=>{
-  if(audio.paused){
-    audio.play();
-    playBtn.textContent = "⏸ Pause Audio";
-  } else {
-    audio.pause();
-    playBtn.textContent = "🔊 Play Audio";
-  }
-});
-
-audio.addEventListener('ended', ()=>{
-  playBtn.textContent = "🔊 Play Audio";
-});
+    const playBtn = document.getElementById('play-audio');
+    playBtn.addEventListener('click', ()=>{
+      if(audio.paused){ audio.play(); playBtn.textContent = "⏸ Pause Audio"; }
+      else { audio.pause(); playBtn.textContent = "🔊 Play Audio"; }
+    });
+    audio.addEventListener('ended', ()=> playBtn.textContent = "🔊 Play Audio");
   </script>
 </body>
 </html>
